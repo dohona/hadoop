@@ -204,6 +204,12 @@ public class MockAM {
   }
 
   public ResourceRequest createResourceReq(String resource, int memory, int priority,
+      int containers, String labelExpression) throws Exception {
+    return createResourceReq(resource, memory, priority, containers,
+        labelExpression, 0.0f);
+  }  
+
+  public ResourceRequest createResourceReq(String resource, int memory, int priority,
       int containers, String labelExpression, float hdfsBandwidthEnforcement)
       throws Exception {
     ResourceRequest req = Records.newRecord(ResourceRequest.class);
