@@ -1710,4 +1710,144 @@
     <name>yarn.nodemanager.webapp.cross-origin.enabled</name>
     <value>false</value>
   </property>
+    <property>
+    <description>
+    Set true to enable the feature of controlling HDFS read rate in NodeManager.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.enable</name>
+    <value>false</value>
+  </property>
+
+  <property>
+    <description>
+    The monitoring port of DataNodes.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.port</name>
+    <value>50010</value>
+  </property>
+
+  <property>
+    <description>
+    The comma separated list of NIC devices to apply LTC settings.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.devices</name>
+    <value>lo</value>
+  </property>
+
+  <property>
+    <description>
+    The time interval in ms for monitoring/collecting TCP connections.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.check-tc-config-interval</name>
+    <value>1000</value>
+  </property>
+
+  <property>
+    <description>
+    Minimum HDFS read rate. By default, it is ignored.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.minimum-rate-mbps</name>
+    <value>0</value>
+  </property>
+
+  <property>
+    <description>
+    Maximum HDFS read rate. By default, it is ignored.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.maximum-rate-mbps</name>
+    <value>0</value>
+  </property>
+
+  <property>
+    <description>
+    If it is true, then NodeManager acts as an external framework and only reports
+    container ids, rates and the first process ids.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.client_mode</name>
+    <value>false</value>
+  </property>
+
+
+  <property>
+    <description>
+    If it is false and NodeManager is not in the client mode, then TrafficController
+    component will be started in NodeManager.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.enable-submitter-only</name>
+    <value>false</value>
+  </property>
+
+  <property>
+    <description>
+    The comma separated list of custom filters for detecting external containers. One such plugin
+    is org.apache.hadoop.yarn.server.nodemanager.trafficcontrol.impl.FileBasedContainerService
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.container-plugins</name>
+    <value></value>
+  </property>
+
+  <property>
+    <description>
+    The plugin to be loaded to report Yarn containers to the standalone HdfsTraficControl. One such
+    plugin is org.apache.hadoop.yarn.server.nodemanager.trafficcontrol.impl.FileBasedYarnContainerReporter
+    if FileBasedContainerService is set.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.container_report_service.class</name>
+    <value></value>
+  </property>
+
+  <property>
+    <description>
+    This property indicates whether the user run NodeManager/ConnectionHandler can execute 'sudo ss'
+    without password for collection TCP connections
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.execute-sudo-ss</name>
+    <value>false</value>
+  </property>
+
+  <property>
+    <description>
+    The monitoring folder in case of FileBasedContainerService plugin is set
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.container-local-data.path</name>
+    <value>/tmp/monitoring_containers</value>
+  </property>
+
+  <property>
+    <description>
+    The name of submitter class for backend storages. Beside the default submitter for HDFS storage,
+    another possible submitter is org.apache.hadoop.yarn.server.nodemanager.trafficcontrol.impl.ZkTCDataSubmitter
+    for ZooKeeper storage.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.submitter.class</name>
+    <value>org.apache.hadoop.yarn.server.nodemanager.trafficcontrol.impl.HdfsTCDataSubmitter</value>
+  </property>
+
+  <property>
+    <description>
+    The name of collector class for backend storages.
+    Beside the default collector for HDFS storage, another possible collectors are
+    org.apache.hadoop.yarn.server.nodemanager.trafficcontrol.impl.ZkTCDataCollector/ZkAsyncTCDataCollector
+    for ZooKeeper storage.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.collector.class</name>
+    <value>org.apache.hadoop.yarn.server.nodemanager.trafficcontrol.impl.HdfsTCDataCollector</value>
+  </property>
+
+  <property>
+    <description>
+    The connect address of the ZooKeeper server, required for ZooKeeper backend storage.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.zk-server.address</name>
+    <value></value>
+  </property>
+
+  <property>
+    <description>
+    The root directory to store HDFS connection data in the case of HDFS back-end storage.
+    It is required in case of multiple users.
+    </description>
+    <name>yarn.nodemanager.hdfs-bandwidth-enforcement.config-root.path</name>
+    <value>/user/{User_start_HDFSTrafficControll}/hdfs_bandwidth_enforcement</value>
+  </property>  
 </configuration>

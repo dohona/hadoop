@@ -2218,4 +2218,20 @@
   <name>mapreduce.job.redacted-properties</name>
   <value></value>
 </property>
+
+<property>
+  <name>mapreduce.map.bandwidth-limit.mbps</name>
+  <value>0</value>
+  <description>
+    Minimum HDFS read limit rate for map tasks.
+  </description>
+</property>
+
+<property>
+  <name>mapreduce.reduce.bandwidth-limit.mbps</name>
+  <value>0</value>
+  <description>
+    Minimum HDFS read limit rate for reduces tasks.
+  </description>
+</property>
 </configuration>
