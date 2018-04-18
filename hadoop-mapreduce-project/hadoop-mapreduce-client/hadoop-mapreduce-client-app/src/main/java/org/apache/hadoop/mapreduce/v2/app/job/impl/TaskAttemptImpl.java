@@ -546,6 +546,12 @@ public abstract class TaskAttemptImpl implements
         getMemoryRequired(conf, taskId.getTaskType()));
     this.resourceCapability.setVirtualCores(
         getCpuRequired(conf, taskId.getTaskType()));
+    float bwLimit = getBandwidthLimit(conf, taskId.getTaskType());
+    this.resourceCapability.setHdfsBandwidthEnforcement(bwLimit);
+
+    LOG.debug("ResourceCapability: memory " + resourceCapability.getMemory()
+        + ", vcore: " + resourceCapability.getVirtualCores()
+        + ", bwLimit: " + resourceCapability.getHdfsBandwidthEnforcement());
 
     this.dataLocalHosts = resolveHosts(dataLocalHosts);
     RackResolver.init(conf);
@@ -590,6 +596,19 @@ public abstract class TaskAttemptImpl implements
     }
     
     return vcores;
+  }
+
+  private float getBandwidthLimit(Configuration conf, TaskType taskType) {
+    float limit = 0;
+    if (taskType == TaskType.MAP) {
+      limit = conf.getFloat(MRJobConfig.MAP_HDFS_BW_LIMIT_MBPS, 0);
+      LOG.debug("MAP Hdfs bandwidth limit: " + limit);
+    } else if (taskType == TaskType.REDUCE) {
+      limit = conf.getFloat(MRJobConfig.REDUCE_HDFS_BW_LIMIT_MBPS, 0);
+      LOG.debug("REDUCE Hdfs bandwidth limit: " + limit);
+    }
+
+     return limit;
   }
 
   /**

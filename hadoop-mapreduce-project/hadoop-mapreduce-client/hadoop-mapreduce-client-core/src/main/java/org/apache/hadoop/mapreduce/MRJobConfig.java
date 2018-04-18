@@ -929,4 +929,10 @@ public interface MRJobConfig {
       "mapreduce.job.finish-when-all-reducers-done";
 
   boolean DEFAULT_FINISH_JOB_WHEN_REDUCERS_DONE = false;
+
+  public static final String MAP_HDFS_BW_LIMIT_MBPS =
+      "mapreduce.map.bandwidth-limit.mbps";
+
+  public static final String REDUCE_HDFS_BW_LIMIT_MBPS =
+      "mapreduce.reduce.bandwidth-limit.mbps";
 }

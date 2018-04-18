@@ -130,6 +130,14 @@ public class MockAM {
     requests.addAll(createReq(hosts, memory, priority, containers));
   }
 
+  public void addRequests(
+      String[] hosts, int memory, int priority, int containers,
+      String labelExpression, float hdfsBandwidthEnforcement)
+      throws Exception {
+    requests.addAll(createReq(hosts, memory, priority, containers,
+        labelExpression, hdfsBandwidthEnforcement));
+  }
+
   public AllocateResponse schedule() throws Exception {
     AllocateResponse response = allocate(requests, releases);
     requests.clear();
@@ -158,39 +166,46 @@ public class MockAM {
   
   public List<ResourceRequest> createReq(String[] hosts, int memory, int priority,
       int containers) throws Exception {
-    return createReq(hosts, memory, priority, containers, null);
+    return createReq(hosts, memory, priority, containers, null, 0.0f);
   }
 
   public List<ResourceRequest> createReq(String[] hosts, int memory, int priority,
       int containers, String labelExpression) throws Exception {
+    return createReq(hosts, memory, priority, containers, labelExpression, 0.0f);
+  }
+
+  public List<ResourceRequest> createReq(String[] hosts, int memory, int priority,
+      int containers, String labelExpression, float hdfsBandwidthEnforcement)
+      throws Exception {
     List<ResourceRequest> reqs = new ArrayList<ResourceRequest>();
     for (String host : hosts) {
       // only add host/rack request when asked host isn't ANY
       if (!host.equals(ResourceRequest.ANY)) {
         ResourceRequest hostReq =
             createResourceReq(host, memory, priority, containers,
-                labelExpression);
+                labelExpression, hdfsBandwidthEnforcement);
         reqs.add(hostReq);
         ResourceRequest rackReq =
             createResourceReq("/default-rack", memory, priority, containers,
-                labelExpression);
+                labelExpression, hdfsBandwidthEnforcement);
         reqs.add(rackReq);
       }
     }
 
     ResourceRequest offRackReq = createResourceReq(ResourceRequest.ANY, memory,
-        priority, containers, labelExpression);
+        priority, containers, labelExpression, hdfsBandwidthEnforcement);
     reqs.add(offRackReq);
     return reqs;
   }
   
   public ResourceRequest createResourceReq(String resource, int memory, int priority,
       int containers) throws Exception {
-    return createResourceReq(resource, memory, priority, containers, null);
+    return createResourceReq(resource, memory, priority, containers, null, 0.0f);
   }
 
   public ResourceRequest createResourceReq(String resource, int memory, int priority,
-      int containers, String labelExpression) throws Exception {
+      int containers, String labelExpression, float hdfsBandwidthEnforcement)
+      throws Exception {
     ResourceRequest req = Records.newRecord(ResourceRequest.class);
     req.setResourceName(resource);
     req.setNumContainers(containers);
@@ -199,6 +214,7 @@ public class MockAM {
     req.setPriority(pri);
     Resource capability = Records.newRecord(Resource.class);
     capability.setMemory(memory);
+    capability.setHdfsBandwidthEnforcement(hdfsBandwidthEnforcement);
     req.setCapability(capability);
     if (labelExpression != null) {
      req.setNodeLabelExpression(labelExpression); 
@@ -306,4 +322,9 @@ public class MockAM {
     }
     return conts;
   }
+
+  public List<ResourceRequest> getRequests() {
+    return requests;
+  }
+
 }

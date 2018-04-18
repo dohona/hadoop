@@ -80,6 +80,18 @@ public class ResourcePBImpl extends Resource {
   }
 
   @Override
+  public float getHdfsBandwidthEnforcement() {
+    ResourceProtoOrBuilder p = viaProto ? proto : builder;
+    return (p.getHdfsBandwidthEnforcement());
+  }
+
+  @Override
+  public void setHdfsBandwidthEnforcement(float bandwidth) {
+    maybeInitBuilder();
+    builder.setHdfsBandwidthEnforcement(bandwidth);
+  }
+
+  @Override
   public int compareTo(Resource other) {
     int diff = this.getMemory() - other.getMemory();
     if (diff == 0) {

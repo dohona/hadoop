@@ -502,10 +502,11 @@ public class ContainerImpl implements Container {
           YarnConfiguration.DEFAULT_NM_VMEM_PMEM_RATIO);
       long vmemBytes = (long) (pmemRatio * pmemBytes);
       int cpuVcores = getResource().getVirtualCores();
+      float bandwidthEnforcement = getResource().getHdfsBandwidthEnforcement();
 
       dispatcher.getEventHandler().handle(
           new ContainerStartMonitoringEvent(containerId,
-              vmemBytes, pmemBytes, cpuVcores));
+              vmemBytes, pmemBytes, cpuVcores, bandwidthEnforcement));
   }
 
   private void addDiagnostics(String... diags) {

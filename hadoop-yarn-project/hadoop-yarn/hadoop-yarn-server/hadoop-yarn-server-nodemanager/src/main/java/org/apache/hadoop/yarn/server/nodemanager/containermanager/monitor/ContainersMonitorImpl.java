@@ -38,6 +38,8 @@ import org.apache.hadoop.yarn.event.Dispatcher;
 import org.apache.hadoop.yarn.server.nodemanager.ContainerExecutor;
 import org.apache.hadoop.yarn.server.nodemanager.Context;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.ContainerKillEvent;
+import org.apache.hadoop.yarn.server.nodemanager.trafficcontrol.impl.ProcBasedConnectionHandler;
+import org.apache.hadoop.yarn.server.nodemanager.trafficcontrol.impl.YarnContainerService;
 import org.apache.hadoop.yarn.server.nodemanager.util.NodeManagerHardwareUtils;
 import org.apache.hadoop.yarn.util.ResourceCalculatorProcessTree;
 import org.apache.hadoop.yarn.util.ResourceCalculatorPlugin;
@@ -78,6 +80,10 @@ public class ContainersMonitorImpl extends AbstractService implements
 
   private static final long UNKNOWN_MEMORY_LIMIT = -1L;
   private int nodeCpuPercentageForYARN;
+
+  // HDFS Bandwidth Enforcement
+  private ProcBasedConnectionHandler connectionHandler;
+  private YarnContainerService yarnContainerRegister;
 
   public ContainersMonitorImpl(ContainerExecutor exec,
       AsyncDispatcher dispatcher, Context context) {
@@ -178,6 +184,16 @@ public class ContainersMonitorImpl extends AbstractService implements
                 1) + "). Thrashing might happen.");
       }
     }
+
+    yarnContainerRegister =
+        YarnContainerService.loadYarnContainerService(conf);
+    if(yarnContainerRegister != null &&
+        !yarnContainerRegister.isClientMode()) {
+      connectionHandler = new ProcBasedConnectionHandler(conf);
+      LOG.info("Register container service plugin: " + yarnContainerRegister);
+      connectionHandler.registerContainerService(yarnContainerRegister);
+    }
+
     super.serviceInit(conf);
   }
 
@@ -192,7 +208,8 @@ public class ContainersMonitorImpl extends AbstractService implements
                 + this.getClass().getName() + " is disabled.");
             return false;
     }
-    if (!(isPmemCheckEnabled() || isVmemCheckEnabled())) {
+    if (!(isPmemCheckEnabled() || isVmemCheckEnabled()
+        || yarnContainerRegister != null)) {		
       LOG.info("Neither virutal-memory nor physical-memory monitoring is " +
           "needed. Not running the monitor-thread");
       return false;
@@ -205,6 +222,20 @@ public class ContainersMonitorImpl extends AbstractService implements
   protected void serviceStart() throws Exception {
     if (this.isEnabled()) {
       this.monitoringThread.start();
+      String hostName = context.getNodeId().getHost();
+      try {
+        if(yarnContainerRegister != null &&
+            yarnContainerRegister.isClientMode()) {
+          yarnContainerRegister.initialize(hostName);
+          yarnContainerRegister.start();
+        }
+        if(connectionHandler != null) {
+          connectionHandler.initialize(hostName);
+          connectionHandler.start();
+        }
+      } catch(Exception e) {
+        LOG.error("Error occured when starting connectionHandler", e);
+      }
     }
     super.serviceStart();
   }
@@ -212,6 +243,17 @@ public class ContainersMonitorImpl extends AbstractService implements
   @Override
   protected void serviceStop() throws Exception {
     if (this.isEnabled()) {
+      try {
+        if(connectionHandler != null) {
+          connectionHandler.stop();
+        }
+        if(yarnContainerRegister != null &&
+            yarnContainerRegister.isClientMode()) {
+          yarnContainerRegister.stop();
+        }
+      } catch(Exception e) {
+        LOG.error("Cannot stop connectionHandler: " + e.getMessage(), e);
+      }
       this.monitoringThread.interrupt();
       try {
         this.monitoringThread.join();
@@ -219,6 +261,7 @@ public class ContainersMonitorImpl extends AbstractService implements
         ;
       }
     }
+
     super.serviceStop();
   }
 
@@ -414,6 +457,9 @@ public class ContainersMonitorImpl extends AbstractService implements
                 // or if the container's pid is removed from ContainerExecutor
                 LOG.debug("Tracking ProcessTree " + pId
                     + " for the first time");
+                if(yarnContainerRegister != null){
+                  yarnContainerRegister.registerPid(containerId, pId);
+                }
 
                 ResourceCalculatorProcessTree pt =
                     ResourceCalculatorProcessTree.getResourceCalculatorProcessTree(pId, processTreeClass, conf);
@@ -628,11 +674,18 @@ public class ContainersMonitorImpl extends AbstractService implements
                 startEvent.getVmemLimit(), startEvent.getPmemLimit(),
                 startEvent.getCpuVcores());
         this.containersToBeAdded.put(containerId, processTreeInfo);
+        if(yarnContainerRegister != null){
+          yarnContainerRegister.addMonitoringContainer(containerId,
+              startEvent.getBandwidthEnforcement());
+        }
       }
       break;
     case STOP_MONITORING_CONTAINER:
       synchronized (this.containersToBeRemoved) {
         this.containersToBeRemoved.add(containerId);
+        if(yarnContainerRegister != null){
+          yarnContainerRegister.stopMonitoringContainer(containerId);
+        }
       }
       break;
     default:

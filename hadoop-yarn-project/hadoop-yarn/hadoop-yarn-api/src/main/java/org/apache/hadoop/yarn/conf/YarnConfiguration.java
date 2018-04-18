@@ -1820,6 +1820,46 @@ public class YarnConfiguration extends Configuration {
       + "enabled";
   public static final boolean DEFAULT_NODE_LABELS_ENABLED = false;
 
+  /**
+   * HDFS Bandwidth Enforcement configurations.
+   */
+  public static final String NM_HDFS_BE_ENABLE =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.enable";
+  public static final boolean DEFAULT_NM_HDFS_BE_ENABLE = false;
+  public static final String NM_HDFS_BE_CLIENT_MODE =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.client_mode";
+  public static final String NM_HDFS_BE_REPORT_SERVICE_CLASS =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.container_report_service.class";
+  public static final String NM_HDFS_BE_ENABLE_SUBMITTER_ONLY =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.enable-submitter-only";
+  public static final String NM_HDFS_BE_CONTAINER_PLUGINS =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.container-plugins";
+  public static final String NM_HDFS_PORT =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.port";
+  public static final int DEFAULT_NM_HDFS_PORT = 50010;
+  public static final String NM_HDFS_BE_DEVICES =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.devices";
+  public static final String DEFAULT_NM_HDFS_BE_DEVICES = "lo";
+  public static final String NM_HDFS_BE_CHECK_TC_INTERVAL_MS =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.check-tc-config-interval";
+  public static final String NM_HDFS_BE_MIN_RATE =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.minimum-rate-mbps";
+  public static final String NM_HDFS_BE_MAX_RATE =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.maximum-rate-mbps";
+  public static final String NM_HDFS_BE_EXECUTE_SUDO_SS =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.execute-sudo-ss";
+  public static final String NM_HDFS_BE_SUBMITTER_CLASS =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.submitter.class";
+  public static final String NM_HDFS_BE_COLLECTOR_CLASS =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.collector.class";
+  public static final long DEFAULT_NM_HDFS_BE_CHECK_TC_INTERVAL_MS = 1000;
+  public static final String NM_HDFS_BE_CONFIG_ROOT_DIR =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.config-root.path";
+  public static final String NM_HDFS_BE_CONTAINER_DATA_LOCAL_PATH =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.container-local-data.path";
+  public static final String NM_HDFS_BE_ZK_SERVER_ADDRESS =
+      NM_PREFIX + "hdfs-bandwidth-enforcement.zk-server.address";
+
   public YarnConfiguration() {
     super();
   }

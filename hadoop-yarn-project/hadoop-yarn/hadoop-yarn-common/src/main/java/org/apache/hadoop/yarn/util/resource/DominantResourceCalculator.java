@@ -163,7 +163,7 @@ public class DominantResourceCalculator extends ResourceCalculator {
         stepFactor.getVirtualCores()),
       maximumResource.getVirtualCores());
     return Resources.createResource(normalizedMemory,
-      normalizedCores);
+      normalizedCores, r.getHdfsBandwidthEnforcement());
   }
 
   @Override

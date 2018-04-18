@@ -40,7 +40,12 @@ import org.apache.hadoop.yarn.util.Records;
  * very coarse.  A complementary axis for CPU requests that represents processing
  * power will likely be added in the future to enable finer-grained resource
  * configuration.</p>
- * 
+ *
+ * <p>In order to manage HDFS bandwidth requests, the new field has been added
+ * to the <code>Resource</code> model (<em>hdfs_bandwidth_enforcement</em>).
+ * The unit for bandwidth is megabytes. The 0 value of bandwidth indicates
+ * that no limitation is set on bandwidth usage </p>
+ *
  * <p>Typically, applications request <code>Resource</code> of suitable
  * capability to run their component tasks.</p>
  * 
@@ -104,6 +109,30 @@ public abstract class Resource implements Comparable<Resource> {
   @Public
   @Evolving
   public abstract void setVirtualCores(int vCores);
+
+  /**
+   * Get <em>HDFS bandwidth enforcement</em> of the resource.
+   *
+   * HDFS bandwidth enforcement defines the limit bandwidth which
+   * the container can use to communicate with local HDFS datanode.
+   *
+   * @return <em>HDFS bandwidth enforcement</em> of the resource
+   */
+  @Public
+  @Evolving
+  public abstract float getHdfsBandwidthEnforcement();
+
+  /**
+   * Set <em>HDFS bandwidth enforcement</em> of the resource.
+   *
+   * HDFS bandwidth enforcement defines the limit bandwidth which
+   * the container can use to communicate with local HDFS DataNode.
+   *
+   * @param hdfsBandwidth <em>HDFS bandwidth enforcement</em> of the resource
+   */
+  @Public
+  @Evolving
+  public abstract void setHdfsBandwidthEnforcement(float hdfsBandwidth);
 
   @Override
   public int hashCode() {

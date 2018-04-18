@@ -51,6 +51,16 @@ public class Resources {
     }
 
     @Override
+    public float getHdfsBandwidthEnforcement() {
+      return 0;
+    }
+
+    @Override
+    public void setHdfsBandwidthEnforcement(float bandwidth) {
+      throw new RuntimeException("NONE cannot be modified!");
+    }
+    
+    @Override
     public int compareTo(Resource o) {
       int diff = 0 - o.getMemory();
       if (diff == 0) {
@@ -84,6 +94,16 @@ public class Resources {
     }
 
     @Override
+    public float getHdfsBandwidthEnforcement() {
+      return Float.MAX_VALUE;
+    }
+
+    @Override
+    public void setHdfsBandwidthEnforcement(float bandwidth) {
+      throw new RuntimeException("NONE cannot be modified!");
+    }
+
+    @Override
     public int compareTo(Resource o) {
       int diff = 0 - o.getMemory();
       if (diff == 0) {
@@ -104,6 +124,15 @@ public class Resources {
     resource.setVirtualCores(cores);
     return resource;
   }
+
+  public static Resource createResource(int memory, int cores,
+      float hdfsBandwidth) {
+	Resource resource = Records.newRecord(Resource.class);
+	resource.setMemory(memory);
+	resource.setVirtualCores(cores);
+	resource.setHdfsBandwidthEnforcement(hdfsBandwidth);
+	return resource;
+  } 
 
   public static Resource none() {
     return NONE;

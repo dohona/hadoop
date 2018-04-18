@@ -380,6 +380,8 @@ public class RMContainerAllocator extends RMContainerRequestor
         reqEvent.getCapability().setMemory(mapResourceRequest.getMemory());
         reqEvent.getCapability().setVirtualCores(
           mapResourceRequest.getVirtualCores());
+        reqEvent.getCapability().setHdfsBandwidthEnforcement(
+          mapResourceRequest.getHdfsBandwidthEnforcement());
         scheduledRequests.addMap(reqEvent);//maps are immediately scheduled
       } else {
         if (reduceResourceRequest.equals(Resources.none())) {
@@ -408,6 +410,8 @@ public class RMContainerAllocator extends RMContainerRequestor
         reqEvent.getCapability().setMemory(reduceResourceRequest.getMemory());
         reqEvent.getCapability().setVirtualCores(
           reduceResourceRequest.getVirtualCores());
+        reqEvent.getCapability().setHdfsBandwidthEnforcement(
+          reduceResourceRequest.getHdfsBandwidthEnforcement());
         if (reqEvent.getEarlierAttemptFailed()) {
           //add to the front of queue for fail fast
           pendingReduces.addFirst(new ContainerRequest(reqEvent,

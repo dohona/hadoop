@@ -70,6 +70,7 @@ import org.apache.hadoop.yarn.server.nodemanager.containermanager.ContainerManag
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.application.ApplicationState;
 import org.apache.hadoop.yarn.server.nodemanager.containermanager.container.Container;
 import org.apache.hadoop.yarn.server.nodemanager.metrics.NodeManagerMetrics;
+import org.apache.hadoop.yarn.server.nodemanager.trafficcontrol.impl.TrafficController;
 import org.apache.hadoop.yarn.util.YarnVersionInfo;
 
 import com.google.common.annotations.VisibleForTesting;
@@ -120,6 +121,9 @@ public class NodeStatusUpdaterImpl extends AbstractService implements
   private Thread  statusUpdater;
   private long rmIdentifier = ResourceManagerConstants.RM_INVALID_IDENTIFIER;
   Set<ContainerId> pendingContainersToRemove = new HashSet<ContainerId>();
+
+  // HDFS Bandwidth Enforcement
+  private TrafficController tcController;
 
   public NodeStatusUpdaterImpl(Context context, Dispatcher dispatcher,
       NodeHealthCheckerService healthChecker, NodeManagerMetrics metrics) {
@@ -177,6 +181,9 @@ public class NodeStatusUpdaterImpl extends AbstractService implements
       LOG.debug(YARN_NODEMANAGER_DURATION_TO_TRACK_STOPPED_CONTAINERS + " :"
         + durationToTrackStoppedContainers);
     }
+
+    tcController = new TrafficController(conf, true);
+
     super.serviceInit(conf);
     LOG.info("Initialized nodemanager for " + nodeId + ":" +
         " physical-memory=" + memoryMb + " virtual-memory=" + virtualMemoryMb +
@@ -188,6 +195,7 @@ public class NodeStatusUpdaterImpl extends AbstractService implements
 
     // NodeManager is the last service to start, so NodeId is available.
     this.nodeId = this.context.getNodeId();
+    LOG.info("Node ID assigned is : " + this.nodeId);
     this.httpPort = this.context.getHttpPort();
     this.nodeManagerVersionId = YarnVersionInfo.getVersion();
     try {
@@ -197,6 +205,12 @@ public class NodeStatusUpdaterImpl extends AbstractService implements
       registerWithRM();
       super.serviceStart();
       startStatusUpdater();
+      String hostId = null;
+      if (this.nodeId != null) {
+        hostId = this.nodeId.getHost();
+      }
+      tcController.initialize(hostId);
+      tcController.start();
     } catch (Exception e) {
       String errorMessage = "Unexpected error starting NodeStatusUpdater";
       LOG.error(errorMessage, e);
@@ -210,6 +224,7 @@ public class NodeStatusUpdaterImpl extends AbstractService implements
       // Interrupt the updater.
       this.isStopped = true;
       stopRMProxy();
+      tcController.stop();
       super.serviceStop();
     }
   }
