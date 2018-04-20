@@ -55,7 +55,7 @@ public class ConnectionCollector {
           + "(timer:\\S+\\s+)?" // timer:(keepalive,120min,0)
           + "(users:\\(\\(.+,(\\d+),\\d+\\)\\)\\s+)?" //
           // users:(("java",14551,246))
-          + "uid:(\\d+)\\s+" + "ino:(\\d+)" + ".+");
+          + "(uid:(\\d+)\\s+)?" + "ino:(\\d+)" + ".+");
   
   public static final Pattern SS_ESTABLISHED_LINE_FORMAT = Pattern
 	  .compile("\\s*\\d+\\s+\\d+\\s+" // recv-send data
@@ -64,7 +64,7 @@ public class ConnectionCollector {
 	      + "(users:\\(\\(.+,pid=(\\d+),fd=\\d+\\)\\)\\s+)?" //
 	      // users:(("java",pid=14551,fd=246))
 	      + "(timer:\\S+\\s+)?" // timer:(keepalive,120min,0)
-	      + "uid:(\\d+)\\s+" + "ino:(\\d+)" + ".+");  
+	      + "(uid:(\\d+)\\s+)?" + "ino:(\\d+)" + ".+");  
 
   public static final Pattern PROC_NET_TCP_LINE_FORMAT = Pattern
       .compile("\\s*\\d+:\\s+" // sl
